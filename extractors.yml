@@ -1,0 +1,20 @@
+# Bash
+# - name: "Bash"
+#   repository: https://github.com/tree-sitter/tree-sitter-bash
+#   extensions:
+#     - ".sh"
+# , ".bash", ".ksh", ".zsh", ".sh.in", ".bash.in", ".ksh.in", ".zsh.in"]
+# SQL
+- name: "SQL"
+  repository: https://github.com/ctcampbell/tree-sitter-sql
+  extensions: [".sql", ".tsql", ".psql", ".plsql"]
+# COBOL
+# - name: "Cobol"
+#   repository: https://github.com/yutaro-sakamoto/tree-sitter-cobol
+#   extensions:
+#     - ".cbl"
+# , ".cob", ".cpy"]
+# Lua
+# - name: "Lua"
+#   repository: https://github.com/tree-sitter-grammars/tree-sitter-lua
+#   extensions: [".lua"]

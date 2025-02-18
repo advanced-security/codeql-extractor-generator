@@ -1,0 +1,111 @@
+mappings:
+  - name: comment
+    pattern: Match
+    aliases:
+      - "Comment"
+      - "CommentBlock"
+
+  - name: block
+    pattern: Match
+    halt: true
+    aliases:
+      - "Block"
+
+  - name: keywords
+    pattern: StartsWith
+    aliases:
+      - "Identifier"
+      - "Identifiers"
+      - "Keyword"
+      - "Keywords"
+
+  - name: literalabstracts
+    pattern: StartsWith
+    aliases:
+      - Numbers
+      - Strings
+      - Booleans
+      - Nulls
+
+  - name: literals
+    pattern: EndsWith
+    aliases:
+      - "Literal"
+      - "Literals"
+    halt: true
+    excludes:
+      - ArrayLiteral
+      - NumberLiteral
+
+  # For SQL
+  - name: conditionals
+    pattern: EndsWith
+    aliases:
+      - "Clause"
+
+  - name: conditionals
+    pattern: StartsWith
+    aliases:
+      - "If"
+      - "ElseIf"
+      - "Else"
+      - "Switch"
+      - "Case"
+      - "Default"
+
+  # Statements
+  - name: statements
+    pattern: StartsOrEndsWith
+    aliases:
+      - "Statement"
+      - "Statements"
+
+  # Expressions
+  - name: expressions
+    pattern: StartsOrEndsWith
+    aliases:
+      - "Expr"
+      - "Expression"
+      - "Expressions"
+
+  # Loops
+  - name: loops
+    pattern: StartsWith
+    aliases:
+      - "For"
+      - "ForEach"
+      - "While"
+      - "Do"
+
+  - name: literals
+    pattern: StartsWith
+    aliases:
+      - "String"
+      - "Char"
+      - "Nchar"
+      # - "Number"
+      - "Integer"
+      - "Int"
+      - "Float"
+      - "Double"
+      # - "Boolean"
+      - "True"
+      - "False"
+      - "Null"
+      - "Nil"
+    excludes:
+      - NullStatement
+
+  - name: calls
+    pattern: StartsWith
+    aliases:
+      - "Call"
+      - "Calls"
+      - "Function"
+      - "Functions"
+
+  - name: variables
+    pattern: StartsWith
+    aliases:
+      - "Variable"
+      - "Variables"
