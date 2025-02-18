@@ -1,0 +1,9 @@
+name: advanced-security/{{ config.name }}-queries
+version: 0.1.0
+groups: 
+  - {{ config.name }}
+  - queries
+dependencies:
+  advanced-security/{{ config.name }}-all: ${workspace}
+extractor: {{ config.name }}
+defaultSuiteFile: codeql-suites/code-scanning.qls
