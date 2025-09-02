@@ -1,15 +1,14 @@
 use anyhow::Result;
-use mappings::Mappings;
 use std::{collections::HashMap, path::PathBuf};
 
 pub mod mappings;
 pub mod tsgrammar;
 
-use codeql_extractor::node_types::{self, Entry, EntryKind, TypeName};
+use codeql_extractor::node_types::{self, Entry, TypeName};
 use std::collections::BTreeMap;
 
-use crate::models::{InitConfig, Repository};
-use tsgrammar::{dbscheme_name_to_class_name, TreeSitterGrammar};
+use crate::config::{Config, Repository};
+use tsgrammar::TreeSitterGrammar;
 
 pub const COMMENTS: [&str; 2] = ["Comment", "CommentBlock"];
 pub const LITERALS: [&str; 12] = [
@@ -32,7 +31,7 @@ pub struct TreeSitterInfo {
     #[serde(skip)]
     pub node_types: BTreeMap<TypeName, Entry>,
     #[serde(skip)]
-    pub mappings: Mappings,
+    pub mappings: Vec<mappings::AstMap>,
 
     /// List of all AST nodes (literals, statements, expressions, loops, misc)
     pub nodes: HashMap<String, Vec<String>>,
@@ -61,36 +60,40 @@ impl TreeSitterInfo {
     }
 
     /// Load from root of the TreeSitter repo
-    pub async fn load(init_config: &InitConfig, path: &PathBuf) -> Result<Self> {
+    pub async fn load(config: &Config, path: &PathBuf) -> Result<Self> {
         log::info!("Loading TreeSitter from `{}`", path.display());
 
         // TODO: Check if the repository exists
-        if !init_config.ts_repo.path.exists() {
-            init_config.ts_repo.clone_repo(init_config).await?;
+        log::info!(
+            "Checking if repository exists at `{}`",
+            config.tree_sitter_repo.path.display()
+        );
+        if !config.tree_sitter_repo.path.exists() {
+            config.tree_sitter_repo.clone_repo(config).await?;
         }
 
         let mut info = Self::new(
-            init_config.language_name.clone(),
+            config.language_name.clone(),
             path,
-            init_config.ts_repo.clone(),
+            config.tree_sitter_repo.clone(),
         );
         // info.update().await?;
 
-        // Load Mappings
-        let mappings_path = init_config
-            .working_dir
-            .join("extractor")
-            .join("mappings.yml");
-        if mappings_path.exists() {
-            info.mappings = Mappings::load(&mappings_path)?;
-            log::info!("Loaded mappings from `mappings.yml`");
-        } else {
-            log::info!("No mappings found");
-            info.mappings = Mappings::load(&PathBuf::from("./mapping.yml"))?;
-        }
+        // // Load Mappings
+        // let mappings_path = config.working_dir.join("extractor").join("mappings.yml");
+        // if mappings_path.exists() {
+        //     info.mappings = Mappings::load(&mappings_path)?;
+        //     log::info!("Loaded mappings from `mappings.yml`");
+        // } else {
+        //     log::info!("No mappings found");
+        //     info.mappings = Mappings::load(&PathBuf::from("./mapping.yml"))?;
+        // }
+        // TODO: Merge mappings
+        info.mappings = config.mappings.clone();
+        log::info!("Loaded mappings: {:?}", info.mappings.len());
 
         info.load_node_types()?;
-        // info.load_ts_grammar(init_config)?;
+        // info.load_ts_grammar(config)?;
 
         Ok(info)
     }
@@ -109,7 +112,7 @@ impl TreeSitterInfo {
         Ok(())
     }
 
-    fn load_node_types(&mut self) -> Result<BTreeMap<TypeName, Entry>> {
+    fn load_node_types(&mut self) -> Result<()> {
         log::debug!("Finding NodeTypes from `{:?}`", self.path);
 
         let node_types_json = self.repository.find_file("node-types.json")?;
@@ -117,6 +120,12 @@ impl TreeSitterInfo {
 
         if !node_types_json.exists() {
             panic!("Node types file does not exist");
+        }
+        if self.mappings.is_empty() {
+            log::error!("Mappings are empty, cannot load node types");
+            return Err(anyhow::anyhow!(
+                "Mappings are empty, cannot load node types"
+            ));
         }
 
         let data = std::fs::read_to_string(node_types_json)?;
@@ -162,11 +171,12 @@ impl TreeSitterInfo {
                     }
                 }
             }
+
             if !known {
                 log::trace!("Unknown node type: {:#?}", class_name);
                 let mut node_entry = self
                     .nodes
-                    .entry("misc".to_string())
+                    .entry("Misc".to_string())
                     .or_insert_with(Vec::new);
                 // Only insert if not already in the list
                 if !node_entry.contains(&class_name) {
@@ -211,11 +221,25 @@ impl TreeSitterInfo {
 
         // Display Nodes metics
         log::debug!("Nodes :: {:#?}", self.nodes);
+        let mut all_count = 0;
+        let mut misc_count = 0;
+
         for (name, map) in &self.nodes {
             if name == "all" {
-                continue;
+                all_count = map.len();
             }
-            log::info!("{:<12} :: {:#?}", name, map.len());
+            if name == "Misc" {
+                misc_count = map.len();
+            }
+            log::info!("{:<18} :: {:#?}", name, map.len());
+        }
+
+        // Check if Misc contains all nodes
+        if misc_count == all_count {
+            log::error!("Misc contains all nodes, this is likely an error");
+            return Err(anyhow::anyhow!(
+                "Misc contains all nodes, this is likely an error"
+            ));
         }
 
         // Old stuff
@@ -270,10 +294,12 @@ impl TreeSitterInfo {
             }
         }
 
-        Ok(btree_nodes)
+        self.node_types = btree_nodes;
+
+        Ok(())
     }
 
-    // fn load_ts_grammar(&mut self, init_config: &InitConfig) -> Result<TreeSitterGrammar> {
+    // fn load_ts_grammar(&mut self, config: &InitConfig) -> Result<TreeSitterGrammar> {
     //     // Find the `grammar.json` file
     //     let grammar_json = self.repository.find_file("grammar.json")?;
     //     log::info!("Found `grammar.json` file: {:?}", grammar_json);

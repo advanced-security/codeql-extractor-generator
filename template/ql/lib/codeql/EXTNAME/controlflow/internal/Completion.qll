@@ -1,11 +1,11 @@
-private import codeql.util.Boolean
+private import codeql.util.Boolean as QLBoolean
 private import codeql.{{ config.name }}.controlflow.ControlFlowGraph
 private import {{ config.name }}
 private import SuccessorType
 
 newtype TCompletion =
   TSimpleCompletion() or
-  TBooleanCompletion(Boolean b) or
+  TBooleanCompletion(QLBoolean::Boolean b) or
   TReturnCompletion()
 
 abstract class Completion extends TCompletion {
@@ -60,8 +60,8 @@ class BooleanCompletion extends ConditionalCompletion, TBooleanCompletion {
    * TODO: This is a placeholder implementation.
    */
   override predicate isValidForSpecific(AstNode e) {
-    {%- if ts.loops.size != 0  %}
-    {%- for loop in ts.loops %}
+    {%- if ts.Loops.size != 0  %}
+    {%- for loop in ts.Loops %}
       e = any({{ loop }} c).getCondition() {%- if forloop.length != forloop.last %} or {% endif %}
     {%- endfor %}
     {%- else %}

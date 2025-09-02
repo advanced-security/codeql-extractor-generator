@@ -1,11 +1,18 @@
+{%- if ts.Misc.size == 0  %}
+/**
+ *  No misc AST Nodes
+ */
+{%- else %}
 private import AstNodes
-private import internal.Misc
+{%- for misc in ts.Misc %}
+private import internal.{{ misc }}
+{%- endfor %}
 
-{%- if ts.misc.size != 0  %}
-{% for misc in ts.misc %}
+
+{%- for misc in ts.Misc %}
 /**
  *  A {{ misc }} unknown AST node.
  */
 class {{ misc }} extends AstNode instanceof {{ misc }}Impl { }
-{% endfor %}
+{%- endfor %}
 {%- endif %}

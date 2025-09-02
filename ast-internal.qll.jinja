@@ -1,0 +1,81 @@
+/**
+ *  Internal implementation for {{ name }}
+ *
+ *  WARNING: this file is generated, do not edit manually
+ */
+private import AstNodes
+private import TreeSitter
+private import codeql.php.ast.AstNodes
+{%- if supertype != "AstNode" %}
+private import {{ supertype }}
+{%- endif %}
+{%- if supertype == "StmtSequence" %}
+private import Stmts
+{%- endif %}
+{%- if supertype == "Conditionals" %}
+private import Expr
+{%- endif %}
+{%- if supertype == "Calls" or supertype == "Loops" %}
+private import Idents
+private import Expr
+{%- endif %}
+
+/**
+ *  A {{ name }} AST Node.
+ */
+class {{ name }}Impl extends T{{ name }}, {{ supertype }}{% if supertype != "AstNode" %}Impl{% endif %} {
+  private {{ ts_namespace }}::{{ name }} ast;
+
+  override string getAPrimaryQlClass() { result = "{{ name }}" }
+
+  {{ name }}Impl() { this = T{{ name }}(ast) }
+
+  override string toString() { result = ast.toString() }
+
+  {%- if supertype == "Literals" %}
+  /**
+   *  Get the literal value
+   */
+  override string getValue() { result = ast.getValue() }
+  {%- endif %}
+  {%- if supertype == "StmtSequence" or supertype == "Block" %}
+
+  override StmtsImpl getStmts() {
+    toTreeSitter(result) = ast.getChild(_)
+  }
+
+  override StmtsImpl getStmt(int index) {
+    toTreeSitter(result) = ast.getChild(index)
+  }
+  {%- endif %}
+  {%- if supertype == "Conditionals" %}
+  /**
+   * Get the condition
+   */
+  override ExprImpl getCondition() {
+    none()
+  }
+  {%- endif %}
+  {%- if supertype == "Idents" %}
+  /**
+   * Get the condition
+   */
+  override string getName() {
+    result = ""
+  }
+  {%- endif %}
+  {%- if supertype == "Calls" %}
+  override IdentsImpl getIdentifier() { none() } 
+
+  override ExprImpl getArguments() { none() }
+
+  override ExprImpl getArgument(int n) { none() } 
+  {%- endif %}
+  {%- if supertype == "Loops" %}
+  override ExprImpl getCondition() { none() }
+
+  override ExprImpl getBody() { none() }
+
+  override IdentsImpl getInitializer() { none() }
+  {%- endif %}
+}

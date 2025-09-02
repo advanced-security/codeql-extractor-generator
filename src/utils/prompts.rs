@@ -7,6 +7,20 @@ pub fn input_prompt(prompt: &str) -> String {
         .expect("Failed to read input")
 }
 
+pub fn select(prompt: &str, options: &[&str]) -> Result<Vec<String>, dialoguer::Error> {
+    dialoguer::MultiSelect::new()
+        .with_prompt(prompt)
+        .items(options)
+        .interact()
+        .map(|selected_indices| {
+            selected_indices
+                .into_iter()
+                .map(|i| options[i].to_string())
+                .collect()
+        })
+        .map_err(|e| e.into())
+}
+
 pub fn input_optional_prompt(prompt: &str) -> Option<String> {
     let input: Result<String, dialoguer::Error> = Input::new()
         .allow_empty(true)

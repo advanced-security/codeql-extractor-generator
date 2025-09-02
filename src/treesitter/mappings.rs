@@ -1,43 +1,30 @@
-use anyhow::Result;
-use std::{collections::HashMap, path::PathBuf};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Default, serde::Deserialize, serde::Serialize)]
-pub struct Mappings {
-    mappings: Vec<AstMap>,
-}
-
-impl Mappings {
-    pub fn load(path: &PathBuf) -> Result<Self> {
-        let content = std::fs::read_to_string(path)?;
-        Ok(serde_yaml::from_str::<Self>(&content)?)
-    }
-}
-
-// Iterator over all mappings in order
-impl IntoIterator for Mappings {
-    type Item = AstMap;
-    type IntoIter = std::vec::IntoIter<AstMap>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.mappings.into_iter()
-    }
-}
-
-#[derive(Debug, Clone, Default, serde::Deserialize, serde::Serialize)]
+/// AST Node
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct AstMap {
+    /// Name of the AST node
     pub name: String,
-
+    /// Parent AST node name
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent: Option<String>,
+    /// Description of the AST node
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub description: String,
+    /// Aliases for the AST node
     #[serde(default)]
     pub aliases: Vec<String>,
-
-    #[serde(default)]
+    /// Excludes for the AST node
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub excludes: Vec<String>,
-
-    #[serde(default)]
+    /// Halt flag to stop processing
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub halt: bool,
-
+    /// Pattern to match the AST node
     #[serde(default)]
     pub pattern: Pattern,
+    /// TS class
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ts_class: Option<TsClass>,
 }
 

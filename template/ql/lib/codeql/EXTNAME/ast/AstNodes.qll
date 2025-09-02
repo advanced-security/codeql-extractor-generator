@@ -80,16 +80,16 @@ class {{ config.display_name }}File extends File {
   int getNumberOfLinesOfCode() { result = count(int line | this.line(line)) }
 }
 
-{% if ts.comment != ""  %}
+{%- assign comment = ts.Comment.first %}
 /**
  * A comment in a {{ config.display_name }} program
  */
-class Comment extends AstNode, T{{ ts.comment }} {
-  private {{ config.name | upcase }}::{{ ts.comment }} comment;
+class Comment extends AstNode, T{{ ts.Comment }} {
+  private {{ config.name | upcase }}::{{ comment  }} comment;
 
-  override string getAPrimaryQlClass() { result = "{{ ts.comment }}" }
+  override string getAPrimaryQlClass() { result = "{{ comment }}" }
 
-  Comment() { this = T{{ ts.comment }}(comment) }
+  Comment() { this = T{{ comment }}(comment) }
 
   /**
    * Gets the text of the comment.
@@ -98,4 +98,3 @@ class Comment extends AstNode, T{{ ts.comment }} {
    */
   string getContents() { result = "" }
 }
-{%- endif %}

@@ -5,12 +5,14 @@ EXTRACTORS=$(yq -r '.[].name' extractors.yml)
 
 for extractor in $EXTRACTORS; do
     echo "Running $extractor"
-    WORKING_DIR=../codeql-extractor-${extractor}
+    WORKING_DIR=../codeql-extractor-php
     mkdir -p $WORKING_DIR
 
-    pushd $WORKING_DIR/extractor/tree-sitter
-    tree-sitter generate
-    popd
+    if [[ ! -d $WORKING_DIR/extractor/tree-sitter ]]; then
+        pushd $WORKING_DIR/extractor/tree-sitter
+        tree-sitter generate
+        popd
+    fi
 
     exts=$(yq -r ".[] | select(.name == \"$extractor\") | .extensions | join(\",\")" extractors.yml)
     echo "Extensions: $exts"
@@ -19,7 +21,7 @@ for extractor in $EXTRACTORS; do
 
     cargo run -- \
         -w $WORKING_DIR \
-        init -n $extractor -e $exts \
+        init -n $extractor -e "$exts" \
         -t $repo
 
 done

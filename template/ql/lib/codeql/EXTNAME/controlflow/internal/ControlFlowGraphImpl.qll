@@ -63,28 +63,44 @@ private module CfgImpl = Make<Location, Implementation>;
 
 import CfgImpl
 
-// TODO: CFG construction for {{ config.display_name }}.
-
+{% for stmt in ts.StmtSequence %}
 /**
- * A literal value in a {{ config.display_name }} program.
+ * A {{ stmt }} statement sequence
  */
-class LiteralTree extends LeafTree instanceof Literals { }
-
-{%- for literal in ts.literals %}
-/**
- * A {{ literal }} literal value in a {{ config.display_name }} program.
- */
-class {{ literal }}LiteralTree extends LeafTree instanceof {{ literal }}Literal { }
+class {{ stmt }}ScopeTree extends StandardTree, PreOrderTree, PostOrderTree, Scope::{{ stmt }}Scope {
+  override AstNode getChildNode(int i) { result = super.getStmt(i) }
+}
 {%- endfor %}
 
-{%- if ts.loops.size != 0  %}
+class CallDefinitionTree extends StandardTree, PreOrderTree, PostOrderTree, Scope::CallDefinitionScope {
+  override AstNode getChildNode(int i) {
+    i = 0 and result = this.getStmt(i)
+  }
+}
+
+/**
+ *  A sequence of statements in a {{ config.display_name }} program.
+ */
+class StmtsTree extends StandardPostOrderTree instanceof Stmts {
+  override AstNode getChildNode(int i) { i = 0 and result = super.getAChild() }
+}
+
+/**
+ *  An expression tree in a {{ config.display_name }} program.
+ */
+class ExprTree extends StandardPostOrderTree instanceof Expr {
+  override AstNode getChildNode(int i) {
+    i = 0 and result = super.getAChild()
+  }
+}
+
 /**
  * A loop expression in a {{ config.display_name }} program.
  */
 abstract class LoopingExprTree extends PostOrderTree {
   override predicate propagatesAbnormal(AstNode child) { child = this.getLoopBody() }
 
-  abstract {{ ts.block_node }} getLoopBody();
+  abstract StmtSequence getLoopBody();
 
   /**
    * Gets the node to execute when continuing the loop; either after
@@ -100,16 +116,14 @@ abstract class LoopingExprTree extends PostOrderTree {
   }
 }
 
-{% for loop in ts.loops %}
 /**
- * A {{ loop }} in a {{ config.display_name }} program.
+ * A literal value in a {{ config.display_name }} program.
  */
-class {{ loop }}Tree extends LoopingExprTree instanceof {{ loop }} {
-  override {{ ts.block_node }} getLoopBody() { result = {{ loop }}.super.getBody() }
+class LiteralTree extends LeafTree instanceof Literals { }
 
-  override AstNode getLoopContinue() { result = {{ loop }}.super.getCondition() }
-
-  override predicate first(AstNode node) { first({{ loop }}.super.getBody(), node) }
-}
-{% endfor %}
-{%- endif %}
+{%- for literal in ts.Literals %}
+/**
+ * A {{ literal }} literal value in a {{ config.display_name }} program.
+ */
+class {{ literal }}LiteralTree extends LeafTree instanceof {{ literal }} { }
+{%- endfor %}

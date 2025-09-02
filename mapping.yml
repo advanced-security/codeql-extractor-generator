@@ -1,49 +1,52 @@
 mappings:
-  - name: comment
+  - name: Comment
     pattern: Match
     aliases:
       - "Comment"
       - "CommentBlock"
 
-  - name: block
+  - name: Block
     pattern: Match
     halt: true
     aliases:
       - "Block"
+      # - Infrastructure
 
-  - name: keywords
+  # - name: Keywords
+  #   pattern: StartsOrEndsWith
+  #   aliases:
+  #     - "Identifier"
+  #     - "Identifiers"
+  #     - "Keyword"
+  #     - "Keywords"
+
+  - name: LiteralAbstracts
     pattern: StartsWith
     aliases:
-      - "Identifier"
-      - "Identifiers"
-      - "Keyword"
-      - "Keywords"
+      - Integer
+      - Number
+      - String
+      - Boolean
+      - "Null"
+      # - Array
 
-  - name: literalabstracts
-    pattern: StartsWith
-    aliases:
-      - Numbers
-      - Strings
-      - Booleans
-      - Nulls
-
-  - name: literals
+  - name: Literals
     pattern: EndsWith
     aliases:
       - "Literal"
       - "Literals"
     halt: true
     excludes:
-      - ArrayLiteral
-      - NumberLiteral
+      - Array
+      - Number
 
   # For SQL
-  - name: conditionals
-    pattern: EndsWith
-    aliases:
-      - "Clause"
+  # - name: Conditionals
+  #   pattern: EndsWith
+  #   aliases:
+  #     - "Clause"
 
-  - name: conditionals
+  - name: Conditionals
     pattern: StartsWith
     aliases:
       - "If"
@@ -54,14 +57,16 @@ mappings:
       - "Default"
 
   # Statements
-  - name: statements
+  - name: Stmts
     pattern: StartsOrEndsWith
     aliases:
       - "Statement"
       - "Statements"
+      - "Declaration"
+      - "UserDefinedFunction"
 
   # Expressions
-  - name: expressions
+  - name: Expr
     pattern: StartsOrEndsWith
     aliases:
       - "Expr"
@@ -69,15 +74,16 @@ mappings:
       - "Expressions"
 
   # Loops
-  - name: loops
+  - name: Loops
     pattern: StartsWith
     aliases:
-      - "For"
-      - "ForEach"
-      - "While"
-      - "Do"
+      # - "For"
+      # - "ForEach"
+      # - "While"
+      # - "Do"
+      - Beans
 
-  - name: literals
+  - name: Literals
     pattern: StartsWith
     aliases:
       - "String"
@@ -96,16 +102,22 @@ mappings:
     excludes:
       - NullStatement
 
-  - name: calls
-    pattern: StartsWith
+  - name: Queries
+    pattern: Match
+    aliases:
+      - "Query"
+      - "Queries"
+
+  - name: Call
+    pattern: Match
     aliases:
       - "Call"
-      - "Calls"
-      - "Function"
-      - "Functions"
+      # - "Calls"
+      # - "Function"
+      # - "Functions"
 
-  - name: variables
-    pattern: StartsWith
-    aliases:
-      - "Variable"
-      - "Variables"
+  # - name: Variables
+  #   pattern: StartsWith
+  #   aliases:
+  #     - "Variable"
+  #     - "Variables"

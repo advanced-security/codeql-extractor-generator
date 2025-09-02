@@ -32,6 +32,10 @@ pub struct Arguments {
     #[clap(short, long, env, default_value = "./")]
     pub working_dir: PathBuf,
 
+    /// Configuration file path
+    #[clap(short, long, env, default_value = "./.codeql/generator.yml")]
+    pub config: PathBuf,
+
     /// Subcommands
     #[clap(subcommand)]
     pub commands: Option<ArgumentCommands>,
@@ -53,6 +57,8 @@ pub enum ArgumentCommands {
         #[clap(short, long, env, default_value = "")]
         tree_sitter_repo: Option<String>,
     },
+    Update {},
+
     Extractor,
 }
 

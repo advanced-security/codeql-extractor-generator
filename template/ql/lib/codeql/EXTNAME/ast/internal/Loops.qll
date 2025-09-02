@@ -1,4 +1,4 @@
-{%- if ts.loops.size == 0  %}
+{%- if ts.Loops.size == 0  %}
 /**
  * Loop statements are not supported in `{{ config.name }}` code.
  */
@@ -10,6 +10,7 @@ private import codeql.{{ config.name }}.ast.AstNodes
 private import AstNodes
 private import TreeSitter
 private import Expr
+private import Idents
 
 /**
  * Loop statements.
@@ -21,23 +22,6 @@ abstract class LoopsImpl extends AstNode, TLoops {
 
   abstract ExprImpl getBody();
 
-  // abstract Identifier getInitializer();
+  abstract IdentsImpl getInitializer();
 }
-{% for loop in ts.loops %}
-/**
- *  A {{ loop }} statement.
- */
-class {{ loop }}Impl extends LoopsImpl, T{{ loop }} {
-  private {{ config.name | upcase }}::{{ loop }} loop;
-
-  override string getAPrimaryQlClass() { result = "{{ loop }}" }
-
-  {{ loop }}Impl() { this = T{{ loop }}(loop) }
-
-  override ExprImpl getCondition() { toTreeSitter(result) = loop.getCondition() }
-
-  override ExprImpl getBody() { toTreeSitter(result) = loop.getBody() }
-
-}
-{% endfor %}
 {%- endif %}
