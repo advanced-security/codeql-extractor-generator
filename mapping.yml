@@ -1,0 +1,123 @@
+mappings:
+  - name: Comment
+    pattern: Match
+    aliases:
+      - "Comment"
+      - "CommentBlock"
+
+  - name: Block
+    pattern: Match
+    halt: true
+    aliases:
+      - "Block"
+      # - Infrastructure
+
+  # - name: Keywords
+  #   pattern: StartsOrEndsWith
+  #   aliases:
+  #     - "Identifier"
+  #     - "Identifiers"
+  #     - "Keyword"
+  #     - "Keywords"
+
+  - name: LiteralAbstracts
+    pattern: StartsWith
+    aliases:
+      - Integer
+      - Number
+      - String
+      - Boolean
+      - "Null"
+      # - Array
+
+  - name: Literals
+    pattern: EndsWith
+    aliases:
+      - "Literal"
+      - "Literals"
+    halt: true
+    excludes:
+      - Array
+      - Number
+
+  # For SQL
+  # - name: Conditionals
+  #   pattern: EndsWith
+  #   aliases:
+  #     - "Clause"
+
+  - name: Conditionals
+    pattern: StartsWith
+    aliases:
+      - "If"
+      - "ElseIf"
+      - "Else"
+      - "Switch"
+      - "Case"
+      - "Default"
+
+  # Statements
+  - name: Stmts
+    pattern: StartsOrEndsWith
+    aliases:
+      - "Statement"
+      - "Statements"
+      - "Declaration"
+      - "UserDefinedFunction"
+
+  # Expressions
+  - name: Expr
+    pattern: StartsOrEndsWith
+    aliases:
+      - "Expr"
+      - "Expression"
+      - "Expressions"
+
+  # Loops
+  - name: Loops
+    pattern: StartsWith
+    aliases:
+      # - "For"
+      # - "ForEach"
+      # - "While"
+      # - "Do"
+      - Beans
+
+  - name: Literals
+    pattern: StartsWith
+    aliases:
+      - "String"
+      - "Char"
+      - "Nchar"
+      # - "Number"
+      - "Integer"
+      - "Int"
+      - "Float"
+      - "Double"
+      # - "Boolean"
+      - "True"
+      - "False"
+      - "Null"
+      - "Nil"
+    excludes:
+      - NullStatement
+
+  - name: Queries
+    pattern: Match
+    aliases:
+      - "Query"
+      - "Queries"
+
+  - name: Call
+    pattern: Match
+    aliases:
+      - "Call"
+      # - "Calls"
+      # - "Function"
+      # - "Functions"
+
+  # - name: Variables
+  #   pattern: StartsWith
+  #   aliases:
+  #     - "Variable"
+  #     - "Variables"

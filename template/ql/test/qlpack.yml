@@ -1,0 +1,9 @@
+name: advanced-security/{{ config.name }}-tests
+groups: [{{ config.name }}, test]
+dependencies:
+dependencies:
+  advanced-security/{{ config.name }}-all: ${workspace}
+  advanced-security/{{ config.name }}-queries: ${workspace}
+extractor: {{ config.name }}
+tests: .
+warnOnImplicitThis: true
